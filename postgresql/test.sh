@@ -7,7 +7,7 @@ set -e
 
 # --- Configuration ---
 # The custom image you built
-IMAGE_NAME="hlw-postgres:16-full"
+IMAGE_NAME="registry.cn-hangzhou.aliyuncs.com/zarra/postgresql:16-full"
 # Name for the server container
 SERVER_CONTAINER_NAME="postgres-server"
 # Name for the client container

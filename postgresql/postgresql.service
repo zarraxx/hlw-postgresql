@@ -1,0 +1,46 @@
+[Unit]
+Description=Podman container for PostgreSQL with Full Extensions (AGE, Vector, Groonga)
+Documentation=https://docs.podman.io/en/latest/Reference.html
+# After/Wants network-online.target is good practice for user services too.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# --- Environment Configuration ---
+# For security, storing credentials in a file is recommended.
+# Ensure the file has strict permissions (e.g., chmod 600).
+# EnvironmentFile=%h/.config/podman/postgres.env
+Environment="POSTGRES_PASSWORD=mysecretpassword"
+Environment="POSTGRES_DB=mydb"
+Environment="POSTGRES_IMAGE=registry.cn-hangzhou.aliyuncs.com/zarra/postgresql:16-full"
+# Define the data path in one place for consistency
+Environment="PG_DATA_PATH=%h/.local/share/postgres/data"
+
+# --- Core Commands ---
+Type=notify
+Restart=always
+TimeoutStopSec=30
+
+# ExecStartPre: Commands to run before starting the container
+# Use a single command for cleaner logic. The '-' prefix ignores errors (e.g., if container doesn't exist).
+ExecStartPre=/bin/sh -c 'mkdir -p ${PG_DATA_PATH}; podman pull ${POSTGRES_IMAGE}; podman rm -f postgres-server || true'
+
+# ExecStart: The main command to start the container
+# Note: No -d or --detach. Systemd manages the process.
+# IMPORTANT: Removed --rm to make the container persistent.
+ExecStart=/usr/bin/podman run \
+  --name=postgres-server \
+  -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+  -e POSTGRES_DB=${POSTGRES_DB} \
+  -p 5432:5432 \
+  --cap-add=NET_RAW \
+  -v ${PG_DATA_PATH}:/var/lib/postgresql/data:Z \
+  --sdnotify=conmon \
+  ${POSTGRES_IMAGE}
+
+# ExecStop: Command to stop the container
+ExecStop=/usr/bin/podman stop postgres-server
+
+[Install]
+# WantedBy=default.target is the correct target for user services.
+WantedBy=default.target
