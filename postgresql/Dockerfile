@@ -1,4 +1,4 @@
-FROM postgresql:18-bookworm
+FROM postgres:18-bookworm
 
 # Switch to the root user to perform installations
 USER root
