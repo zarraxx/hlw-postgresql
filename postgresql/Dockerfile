@@ -1,4 +1,4 @@
-FROM registry.cn-hangzhou.aliyuncs.com/zarra/postgresql:18-bookworm
+FROM postgresql:18-bookworm
 
 # Switch to the root user to perform installations
 USER root
