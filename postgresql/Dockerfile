@@ -1,11 +1,14 @@
-FROM postgres:16-bookworm
+# 1. 在 FROM 之前定义 ARG，以便在 FROM 镜像名中使用
+ARG PG_VERSION=16
 
-# Switch to the root user to perform installations
+FROM postgres:${PG_VERSION}-bookworm
+
+# 2. 在 FROM 之后必须重新声明一下该 ARG，才能在 RUN 脚本中使用
+ARG PG_VERSION
+
 USER root
 
-# 1. Update and install prerequisite packages.
-#    - lsb-release: needed to identify the Debian version name (e.g., "bookworm").
-#    - curl, gnupg, ca-certificates: required to add new APT repositories securely.
+# 1. 安装基础工具
 RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release \
     curl wget \
@@ -15,31 +18,35 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-
+# 2. 安装 Groonga 源
 RUN DEBIAN_FRONTEND=noninteractive curl -fsSLo /tmp/groonga-source.deb https://packages.groonga.org/debian/groonga-apt-source-latest-$(lsb_release -cs).deb && \
     apt-get update && \
     apt-get install -y /tmp/groonga-source.deb && \
     rm /tmp/groonga-source.deb
 
-
-#RUN  wget https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb && \
-#    dpkg -i percona-release_latest.$(lsb_release -sc)_all.deb && \
-#    rm percona-release_latest.$(lsb_release -sc)_all.deb
-
-# 4. Install all PostgreSQL extensions from the newly added repositories.
-#    We run apt-get update again to fetch the package lists from the new sources.
+# 3. 安装扩展 - 使用 ${PG_VERSION} 变量替代具体的数字
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    postgresql-16-pgvector \
-    postgresql-16-age \
-    postgresql-16-pgdg-pgroonga pgxnclient \
-    postgresql-plpython3-16 postgresql-16-pljs postgresql-16-pllua \
-    postgresql-16-cron postgresql-16-http postgresql-16-ip4r postgresql-16-orafce postgresql-16-pgaudit  \
-    postgresql-16-pgrouting postgresql-16-postgis-3 postgresql-16-pgmp postgresql-16-partman postgresql-16-wal2json \
-    postgresql-16-mysql-fdw postgresql-16-oracle-fdw postgresql-16-tds-fdw \
-    # Clean up APT cache to reduce image size
+    postgresql-${PG_VERSION}-pgvector \
+    postgresql-${PG_VERSION}-age \
+    postgresql-${PG_VERSION}-pgdg-pgroonga pgxnclient \
+    postgresql-plpython3-${PG_VERSION} \
+    postgresql-${PG_VERSION}-pljs \
+    postgresql-${PG_VERSION}-pllua \
+    postgresql-${PG_VERSION}-cron \
+    postgresql-${PG_VERSION}-http \
+    postgresql-${PG_VERSION}-ip4r \
+    postgresql-${PG_VERSION}-orafce \
+    postgresql-${PG_VERSION}-pgaudit  \
+    postgresql-${PG_VERSION}-pgrouting \
+    postgresql-${PG_VERSION}-postgis-3 \
+    postgresql-${PG_VERSION}-pgmp \
+    postgresql-${PG_VERSION}-partman \
+    postgresql-${PG_VERSION}-wal2json \
+    postgresql-${PG_VERSION}-mysql-fdw \
+    postgresql-${PG_VERSION}-oracle-fdw \
+    postgresql-${PG_VERSION}-tds-fdw \
     && rm -rf /var/lib/apt/lists/*
 
-    
 COPY 01-configure-age.sh /docker-entrypoint-initdb.d/ 
 
 CMD ["postgres", "-c", "shared_preload_libraries=age"]
