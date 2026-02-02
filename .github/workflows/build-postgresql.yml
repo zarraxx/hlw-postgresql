@@ -45,7 +45,7 @@ jobs:
           # 指定 Dockerfile 所在的目录上下文
           context: ./postgresql
           # 指定 Dockerfile 的路径
-          file: ./postgresql/Dockerfile
+          file: Dockerfile
           # 开启多架构支持
           platforms: linux/amd64,linux/arm64
           # 只有在推送分支时执行推送操作
