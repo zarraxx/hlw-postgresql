@@ -49,7 +49,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 #COPY 01-configure-age.sh /docker-entrypoint-initdb.d/
-
+USER postgres
 CMD ["postgres", \
      "-c", "shared_preload_libraries=age,pgaudit,pg_partman_bgw,pg_stat_statements"]
 
