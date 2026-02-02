@@ -1,10 +1,11 @@
-# 1. 在 FROM 之前定义 ARG，以便在 FROM 镜像名中使用
-ARG PG_VERSION=16
 
-FROM postgres:${PG_VERSION}-bookworm
+# 1. 在 FROM 之前定义 ARG，以便在 FROM 镜像名中使用
+ARG PG_MAJOR_VERSION=18
+
+FROM docker.io/postgres:${PG_MAJOR_VERSION}-bookworm
 
 # 2. 在 FROM 之后必须重新声明一下该 ARG，才能在 RUN 脚本中使用
-ARG PG_VERSION
+ARG PG_MAJOR_VERSION
 
 USER root
 
@@ -26,27 +27,29 @@ RUN DEBIAN_FRONTEND=noninteractive curl -fsSLo /tmp/groonga-source.deb https://p
 
 # 3. 安装扩展 - 使用 ${PG_VERSION} 变量替代具体的数字
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    postgresql-${PG_VERSION}-pgvector \
-    postgresql-${PG_VERSION}-age \
-    postgresql-${PG_VERSION}-pgdg-pgroonga pgxnclient \
-    postgresql-plpython3-${PG_VERSION} \
-    postgresql-${PG_VERSION}-pljs \
-    postgresql-${PG_VERSION}-pllua \
-    postgresql-${PG_VERSION}-cron \
-    postgresql-${PG_VERSION}-http \
-    postgresql-${PG_VERSION}-ip4r \
-    postgresql-${PG_VERSION}-orafce \
-    postgresql-${PG_VERSION}-pgaudit  \
-    postgresql-${PG_VERSION}-pgrouting \
-    postgresql-${PG_VERSION}-postgis-3 \
-    postgresql-${PG_VERSION}-pgmp \
-    postgresql-${PG_VERSION}-partman \
-    postgresql-${PG_VERSION}-wal2json \
-    postgresql-${PG_VERSION}-mysql-fdw \
-    postgresql-${PG_VERSION}-oracle-fdw \
-    postgresql-${PG_VERSION}-tds-fdw \
+    postgresql-${PG_MAJOR_VERSION}-pgvector \
+    postgresql-${PG_MAJOR_VERSION}-age \
+    postgresql-${PG_MAJOR_VERSION}-pgdg-pgroonga pgxnclient \
+    postgresql-plpython3-${PG_MAJOR_VERSION} \
+    postgresql-${PG_MAJOR_VERSION}-pljs \
+    postgresql-${PG_MAJOR_VERSION}-pllua \
+    postgresql-${PG_MAJOR_VERSION}-cron \
+    postgresql-${PG_MAJOR_VERSION}-http \
+    postgresql-${PG_MAJOR_VERSION}-ip4r \
+    postgresql-${PG_MAJOR_VERSION}-orafce \
+    postgresql-${PG_MAJOR_VERSION}-pgaudit  \
+    postgresql-${PG_MAJOR_VERSION}-pgrouting \
+    postgresql-${PG_MAJOR_VERSION}-postgis-3 \
+    postgresql-${PG_MAJOR_VERSION}-pgmp \
+    postgresql-${PG_MAJOR_VERSION}-partman \
+    postgresql-${PG_MAJOR_VERSION}-wal2json \
+    postgresql-${PG_MAJOR_VERSION}-mysql-fdw \
+    postgresql-${PG_MAJOR_VERSION}-oracle-fdw \
+    postgresql-${PG_MAJOR_VERSION}-tds-fdw \
     && rm -rf /var/lib/apt/lists/*
 
 #COPY 01-configure-age.sh /docker-entrypoint-initdb.d/
 
-CMD ["postgres", "-c", "shared_preload_libraries=age"]
+CMD ["postgres", \
+     "-c", "shared_preload_libraries=age,pgaudit,pg_partman_bgw,pg_stat_statements"]
+
