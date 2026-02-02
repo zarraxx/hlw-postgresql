@@ -43,9 +43,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           # 指定 Dockerfile 所在的目录上下文
-          context: ./postgresql
+          #context: ./postgresql
           # 指定 Dockerfile 的路径
-          file: Dockerfile
+          file: ./postgresql/Dockerfile
           # 开启多架构支持
           platforms: linux/amd64,linux/arm64
           # 只有在推送分支时执行推送操作
