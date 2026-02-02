@@ -51,7 +51,7 @@ jobs:
           # 只有在推送分支时执行推送操作
           push: true
           build-args: |
-            PG_VERSION=${{ steps.vars.outputs.pg_ver }}
+            PG_MAJOR_VERSION=${{ steps.vars.outputs.pg_ver }}
           # 动态标签：使用 github.ref_name 自动获取分支名 (16-bookworm 或 18-bookworm)
           tags: |
             registry.cn-hangzhou.aliyuncs.com/zarra/postgresql:${{ github.ref_name }}
