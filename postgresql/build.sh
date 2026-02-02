@@ -4,7 +4,7 @@
 # 如果任何命令失败，脚本将立即退出
 set -e
 # 定义镜像名称，方便后续修改
-IMAGE_NAME="hlw-postgres:16-full"
+IMAGE_NAME="hlw-postgres:18-bookworm"
 
 # --- 步骤 1: 清理悬空 (Orphan) 镜像 ---
 echo "--> STEP 1: Pruning dangling (orphan) images..."
@@ -35,7 +35,7 @@ echo "--> STEP 3: Building the new image: ${IMAGE_NAME}"
 #    -t "${IMAGE_NAME}" .
 
 
-podman build -t "${IMAGE_NAME}" .
+podman build --build-arg=PG_MAJOR_VERSION=18 -t "${IMAGE_NAME}" .
 
 echo # 打印一个空行
 echo "--> BUILD COMPLETE! Image '${IMAGE_NAME}' is now ready to use."
