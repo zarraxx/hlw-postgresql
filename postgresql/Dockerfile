@@ -12,7 +12,7 @@ USER root
 # 1. 安装基础工具
 RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release \
-    curl wget \
+    curl wget telnet \
     gnupg \
     net-tools \
     iputils-ping \
