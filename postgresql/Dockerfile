@@ -1,6 +1,6 @@
 
 # 1. 在 FROM 之前定义 ARG，以便在 FROM 镜像名中使用
-ARG PG_MAJOR_VERSION=18
+ARG PG_MAJOR_VERSION=16
 
 FROM docker.io/postgres:${PG_MAJOR_VERSION}-bookworm
 
@@ -12,7 +12,7 @@ USER root
 # 1. 安装基础工具
 RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release \
-    curl wget \
+    curl wget telnet \
     gnupg \
     net-tools \
     iputils-ping \
